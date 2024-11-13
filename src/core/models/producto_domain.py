@@ -10,4 +10,4 @@ class ProductoDomain(BaseModel):
     descuento: float
     imagen: bytes
     stock: int
-    idCategoria:int
+    idCategoria: int

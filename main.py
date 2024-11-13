@@ -6,6 +6,7 @@ from src.presentation.controllers.producto_controller import producto_controller
 from src.presentation.controllers.delivery_controller import delivery_controller
 from src.presentation.controllers.pedido_controller import pedido_controller
 from src.presentation.controllers.detallepedido_controller import detalle_pedido_controller
+from src.presentation.controllers.categoria_controller import categoria_controller
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -25,6 +26,7 @@ app.include_router(cliente_controller)
 app.include_router(producto_controller)
 app.include_router(delivery_controller)
 app.include_router(pedido_controller)
+app.include_router(categoria_controller)
 app.include_router(detalle_pedido_controller)
 
 
