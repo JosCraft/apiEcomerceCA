@@ -20,45 +20,56 @@ class CategoriaRepository(ICategoriaRepository):
             print(f"Error en 'get': {error}")
         return None
 
-    async def create(self, categoria: CategoriaDomain) -> int:
+    async def create(self, categoria: CategoriaDomain) -> CategoriaDomain:
         try:
             with self.connection.cursor() as cursor:
+                # Insertar la categoría
                 cursor.execute(
                     """
                     INSERT INTO categoria (nombreCategoria)
-                    VALUES (%s, %s)
+                    VALUES (%s)
                     """,
-                    (
-                        categoria.nombreCategoria,
-                    )
+                    (categoria.nombreCategoria,)
                 )
                 self.connection.commit()
+
+                # Obtener el ID de la última inserción
                 cursor.execute("SELECT LAST_INSERT_ID()")
                 last_id = cursor.fetchone()[0]
-                return last_id
+
+                # Crear y devolver el objeto `CategoriaDomain` completo
+                nueva_categoria = CategoriaDomain(id=last_id, nombreCategoria=categoria.nombreCategoria)
+                return nueva_categoria
         except Exception as err:
             print(f"Error en 'create': {err}")
             return None
 
-    async def update(self, idCategoria: int, categoria: CategoriaDomain):
+    async def update(self, id: int, categoria: CategoriaDomain) -> CategoriaDomain:
         try:
             with self.connection.cursor() as cursor:
+                # Actualizar la categoría
                 cursor.execute(
                     """
-                    UPDATE categoria 
-                    SET nombreCategoria=%s
-                    WHERE idCategoria=%s
+                    UPDATE categoria
+                    SET nombreCategoria = %s
+                    WHERE idCategoria = %s
                     """,
-                    (
-                        categoria.nombreCategoria,
-                        idCategoria
-                    )
+                    (categoria.nombreCategoria, id)
                 )
                 self.connection.commit()
-                return True
+
+                # Obtener el objeto `CategoriaDomain` actualizado
+                cursor.execute("SELECT idCategoria, nombreCategoria FROM categoria WHERE idCategoria = %s", (id,))
+                row = cursor.fetchone()
+
+                if row:
+                    categoria_actualizada = CategoriaDomain(id=row[0], nombreCategoria=row[1])
+                    return categoria_actualizada
+                else:
+                    return None
         except Exception as err:
             print(f"Error en 'update': {err}")
-            return False
+            return None
 
     async def delete(self, id: int) -> bool:
         try:

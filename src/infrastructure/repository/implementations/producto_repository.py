@@ -59,7 +59,7 @@ class ProductoRepository(IProductoRepository):
                 cursor.execute(
                     """
                     UPDATE producto
-                    SET nombre = %s, descripcion = %s, precio = %s, descuento = %s, imagen = %s, stock = %s
+                    SET nombre = %s, descripcion = %s, precio = %s, descuento = %s, imagen = %s, stock = %s, idCategoria = %s
                     WHERE idProducto = %s
                     """,
                     (
@@ -69,6 +69,7 @@ class ProductoRepository(IProductoRepository):
                         producto.descuento,
                         producto.imagen,
                         producto.stock,
+                        producto.idCategoria,
                         idProducto  # Correct parameter name
                     )
                 )
