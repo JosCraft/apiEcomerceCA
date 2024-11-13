@@ -3,9 +3,9 @@ from abc import ABC, abstractmethod
 from src.core.models.example_domain import ExampleDomain
 
 
-class IExampleRepository(ABC):
+class IPedidoRepository(ABC):
     @abstractmethod
-    async def get(self, id: int) -> ExampleDomain:
+    async def get_all_by_id(self, id: int) -> ExampleDomain:
         pass
 
     @abstractmethod

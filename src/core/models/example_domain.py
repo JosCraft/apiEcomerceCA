@@ -6,3 +6,7 @@ class ExampleDomain(BaseModel):
     id: Optional[int] = None
     nombre: str
     medida: str
+
+
+
+
