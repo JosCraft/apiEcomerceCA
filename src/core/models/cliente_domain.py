@@ -8,3 +8,4 @@ class ClienteDomain(BaseModel):
     telefono: int
     email: str
     password: str
+
