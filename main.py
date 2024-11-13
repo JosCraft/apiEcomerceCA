@@ -21,11 +21,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_route(cliente_controller)
-app.include_route(producto_controller)
-app.include_route(delivery_controller)
-app.include_route(pedido_controller)
-app.include_route(detalle_pedido_controller)
+app.include_router(cliente_controller)
+app.include_router(producto_controller)
+app.include_router(delivery_controller)
+app.include_router(pedido_controller)
+app.include_router(detalle_pedido_controller)
 
 
 if __name__ == "__main__":
