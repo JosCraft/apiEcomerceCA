@@ -3,7 +3,7 @@ from src.core.models.cliente_domain import ClienteDomain
 
 class ClienteRepository(IClienteRepository):
 
-    def __init__(self, connection):
+    def __init__(self, connection: object) -> object:
         self.connection = connection
 
     async def get(self, id: int) -> ClienteDomain:
@@ -24,6 +24,23 @@ class ClienteRepository(IClienteRepository):
             print(f"Error en 'get': {error}")
         return None
 
+    async def get_by_email(self, email: str) -> ClienteDomain:
+        try:
+            with self.connection.cursor(dictionary=True) as cursor:
+                cursor.execute("SELECT * FROM cliente WHERE email=%s", (email,))
+                result = cursor.fetchone()
+                if result:
+                    return ClienteDomain(
+                        idCliente=result['idCliente'],
+                        nombre=result['nombre'],
+                        direccion=result['direccion'],
+                        telefono=result['telefono'],
+                        email=result['email'],
+                        password=result['password']
+                    )
+        except Exception as error:
+            print(f"Error en 'get_by_email': {error}")
+        return None
     async def create(self, cliente: ClienteDomain) -> int:
         try:
             with self.connection.cursor() as cursor:
@@ -103,3 +120,5 @@ class ClienteRepository(IClienteRepository):
         except Exception as err:
             print(f"Error en 'get_all': {err}")
             return []
+
+

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status,Form
 from src.core.abstractions.services.cliente_service_abstract import IClienteService
 from src.core.dependency_inyection.dependency_inyection import build_cliente_service
 from src.presentation.dto.cliente_dto import clienteDTO
@@ -34,14 +34,31 @@ async def create_cliente(
     cliente_dto: clienteDTO,
     cliente_service: IClienteService = Depends(build_cliente_service)
 ):
-    print('dt')
-    print(cliente_dto)
     cliente = map_domain_dto_to_cliente(cliente_dto)
-    print('mp')
-    print(cliente)
     return await cliente_service.create_cliente(cliente)
+@cliente_controller.post("/login(email)", response_model=ClienteDomain)
+async def login_cliente(
+    email: str = Form(...),  # Recibe el correo del cliente desde el formulario
+    password: str = Form(...),  # Recibe la contraseña desde el formulario
+    cliente_service: IClienteService = Depends(build_cliente_service)
+):
+    # Verificar si el cliente existe en la base de datos por email
+    cliente = await cliente_service.get_cliente_by_email(email)
+    if not cliente:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Email no registrado"
+        )
 
+    # Verificar si la contraseña coincide
+    if cliente.password != password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Contraseña incorrecta"
+        )
 
+    # Si todo es correcto, devolver el cliente
+    return cliente
 @cliente_controller.put("/cliente/{id}", response_model=ClienteDomain)
 async def update_cliente(
     id: int,

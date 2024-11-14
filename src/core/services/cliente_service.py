@@ -42,3 +42,9 @@ class ClienteService(IClienteService):
 
     async def get_all_clientes(self) -> list[ClienteDomain]:
         return await self.cliente_repository.get_all()
+
+    async def get_cliente_by_email(self, email: str) -> ClienteDomain:
+        cliente = await self.cliente_repository.get_by_email(email)
+        if cliente is None:
+            raise ValueError(f"Cliente with email {email} not found")
+        return cliente

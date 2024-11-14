@@ -24,3 +24,8 @@ class IDeliveryService(ABC):
     @abstractmethod
     async def get_all_deliveries(self) -> list[DeliveryDomain]:
         pass
+
+    @abstractmethod
+    async def get_delivery_by_email(self, email: str, delivery: DeliveryDomain) -> DeliveryDomain:
+        pass
+

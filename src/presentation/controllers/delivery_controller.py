@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status,Form
 from src.core.abstractions.services.delivery_service_abstract import IDeliveryService
 from src.core.dependency_inyection.dependency_inyection import build_delivery_service
 from src.presentation.dto.delivery_dto import DeliveryDTO
@@ -33,7 +33,29 @@ async def create_delivery(
 ):
     delivery = map_domain_dto_to_delivery(delivery_dto)
     return await delivery_service.create_delivery(delivery)
+@delivery_controller.post("/login", response_model=DeliveryDomain)
+async def login_delivery(
+    email: str = Form(...),  # Recibe el correo del delivery desde el formulario
+    password: str = Form(...),  # Recibe la contraseña desde el formulario
+    delivery_service: IDeliveryService = Depends(build_delivery_service)  # Usando el servicio de delivery
+):
+    # Verificar si el delivery existe en la base de datos por email
+    delivery = await delivery_service.get_delivery_by_email(email)  # Usar el servicio de delivery
+    if not delivery:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Email no registrado"
+        )
 
+    # Verificar si la contraseña coincide
+    if delivery.password != password:  # Comparar con la contraseña del delivery
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Contraseña incorrecta"
+        )
+
+    # Si todo es correcto, devolver el delivery
+    return delivery
 @delivery_controller.put("/delivery/{id}", response_model=DeliveryDomain)
 async def update_delivery(
     id: int,
