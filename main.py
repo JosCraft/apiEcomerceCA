@@ -33,4 +33,5 @@ app.include_router(detalle_pedido_controller)
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="192.168.0.16", port=8000, log_level="debug")
+    #sovic uvicorn.run(app, host="192.168.1.100", port=8000, log_level="debug")
 
