@@ -8,3 +8,4 @@ class ProductoDTO(BaseModel):
     descuento: float
     imagen: bytes
     stock: int
+    idCategoria:int

@@ -74,6 +74,7 @@ async def create_producto(
         precio: float = Form(...),
         descuento: float = Form(...),
         stock: int = Form(...),
+        idcategoria: int = Form(...),
         imagen: UploadFile = File(...),
         producto_service: IProductoService = Depends(build_prodcuto_service)
 ):
@@ -87,7 +88,8 @@ async def create_producto(
         precio=precio,
         descuento=descuento,
         imagen=imagen_base64,
-        stock=stock
+        stock=stock,
+        idCategoria=idcategoria
     )
 
     # Mapear el DTO a ProductoDomain y crear el producto
@@ -103,6 +105,7 @@ async def update_producto(
         precio: float = Form(...),
         descuento: float = Form(...),
         stock: int = Form(...),
+        idCategoria:int =Form(...),
         imagen: UploadFile = File(...),
         producto_service: IProductoService = Depends(build_prodcuto_service)
 ):
@@ -123,7 +126,8 @@ async def update_producto(
         precio=precio,
         descuento=descuento,
         imagen=imagen_base64,
-        stock=stock
+        stock=stock,
+        idCategoria=idCategoria
     )
 
     # Mapear el DTO a ProductoDomain y actualizar el producto

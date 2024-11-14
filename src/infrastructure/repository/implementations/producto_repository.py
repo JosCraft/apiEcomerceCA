@@ -20,6 +20,7 @@ class ProductoRepository(IProductoRepository):
                         descuento=result['descuento'],
                         imagen=result['imagen'],
                         stock=result['stock'],
+                        idCategoria=result['idCategoria']
                     )
         except Exception as error:
             print(f"Error: {error}")
@@ -30,8 +31,8 @@ class ProductoRepository(IProductoRepository):
             with self.connection.cursor() as cursor:
                 cursor.execute(
                     """
-                    INSERT INTO producto (nombre, descripcion, precio, descuento, imagen, stock)
-                    VALUES (%s, %s, %s, %s, %s, %s)
+                    INSERT INTO producto (nombre, descripcion, precio, descuento, imagen, stock,idCategoria)
+                    VALUES (%s, %s, %s, %s, %s, %s,%s)
                     """,
                     (
                         producto.nombre,
@@ -39,7 +40,8 @@ class ProductoRepository(IProductoRepository):
                         producto.precio,
                         producto.descuento,
                         producto.imagen,
-                        producto.stock
+                        producto.stock,
+                        producto.idCategoria
                     )
                 )
                 self.connection.commit()
@@ -57,7 +59,7 @@ class ProductoRepository(IProductoRepository):
                 cursor.execute(
                     """
                     UPDATE producto
-                    SET nombre = %s, descripcion = %s, precio = %s, descuento = %s, imagen = %s, stock = %s
+                    SET nombre = %s, descripcion = %s, precio = %s, descuento = %s, imagen = %s, stock = %s, idCategoria = %s
                     WHERE idProducto = %s
                     """,
                     (
@@ -67,6 +69,7 @@ class ProductoRepository(IProductoRepository):
                         producto.descuento,
                         producto.imagen,
                         producto.stock,
+                        producto.idCategoria,
                         idProducto  # Correct parameter name
                     )
                 )
@@ -104,7 +107,8 @@ class ProductoRepository(IProductoRepository):
                             precio=row['precio'],
                             descuento=row['descuento'],
                             imagen=row['imagen'],
-                            stock=row['stock']
+                            stock=row['stock'],
+                            idCategoria=row['idCategoria']
                         )
                     )
             return lista_producto

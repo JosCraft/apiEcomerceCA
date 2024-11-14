@@ -7,5 +7,6 @@ def map_domain_dto_to_producto(productoDTO:ProductoDTO)->ProductoDomain:
         precio=productoDTO.precio,
         descuento=productoDTO.descuento,
         imagen=productoDTO.imagen,
-        stock=productoDTO.stock
+        stock=productoDTO.stock,
+        idCategoria=productoDTO.idCategoria
     )
