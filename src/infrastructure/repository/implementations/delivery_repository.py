@@ -25,7 +25,25 @@ class deliveryRepository(IDeliveryRepository):
             print(f"Error: {error}")
         return None
 
-
+    async def get_delivery_by_email(self, email: str) -> DeliveryDomain:
+        try:
+            with self.connection.cursor(dictionary=True) as cursor:
+                cursor.execute("SELECT * FROM delivery WHERE email=%s", (email,))
+                result = cursor.fetchone()
+                if result:
+                    return DeliveryDomain(
+                        idDelivery=result['idDelivery'],
+                        nombre=result['nombre'],
+                        turno=result['turno'],
+                        email=result['email'],
+                        estado=result['estado'],
+                        ubicacion=result['ubicacion'],
+                        password=result['password'],
+                        # Recuerda usar hashing de contraseñas
+                    )
+        except Exception as error:
+            print(f"Error en 'get_delivery_by_email': {error}")
+        return None
     async def create(self, delivery: DeliveryDomain) -> DeliveryDomain:
         try:
             with self.connection.cursor() as cursor:

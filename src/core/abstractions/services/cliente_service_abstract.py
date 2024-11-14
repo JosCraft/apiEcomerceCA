@@ -23,3 +23,7 @@ class IClienteService(ABC):
     @abstractmethod
     async def get_all_clientes(self) -> list[ClienteDomain]:
         pass
+
+    @abstractmethod
+    async def get_cliente_by_email(self, email:str,cliente: ClienteDomain) -> ClienteDomain:
+        pass

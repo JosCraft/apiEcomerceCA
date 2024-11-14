@@ -42,3 +42,9 @@ class DeliveryService(IDeliveryService):
 
     async def get_all_deliveries(self) -> list[DeliveryDomain]:
         return await self.delivery_repository.get_all()
+
+    async def get_delivery_by_email(self, email: str) -> DeliveryDomain:
+        delivery = await self.delivery_repository.get_delivery_by_email(email)
+        if delivery is None:
+            raise ValueError(f"Cliente with email {email} not found")
+        return delivery

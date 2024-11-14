@@ -22,3 +22,7 @@ class IClienteRepository(ABC):
     @abstractmethod
     async def get_all(self) -> list[ClienteDomain]:
         pass
+
+    @abstractmethod
+    async def get_by_email(self, email: str) -> ClienteDomain:
+        pass
