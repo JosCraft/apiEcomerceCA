@@ -8,6 +8,6 @@ class ProductoDomain(BaseModel):
     descripcion: str
     precio: float
     descuento: float
-    imagen: bytes
+    imagen: str
     stock: int
     idCategoria: int
