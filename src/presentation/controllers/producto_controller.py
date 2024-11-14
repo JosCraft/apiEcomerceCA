@@ -1,13 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
-from fastapi.responses import Response
+from fastapi.responses import Response, FileResponse
 from src.core.abstractions.services.producto_service_abstract import IProductoService
 from src.core.dependency_inyection.dependency_inyection import build_prodcuto_service
 from src.presentation.dto.producto_dto import ProductoDTO
 from src.presentation.mappers.map_dto_domain_producto import map_domain_dto_to_producto
 from src.core.models.producto_domain import ProductoDomain
-import base64
+import os
+from uuid import uuid4
 
 producto_controller = APIRouter(prefix="/api/v1", tags=["producto"])
+
+# Definir la carpeta donde se guardarán las imágenes
+IMAGES_DIR = "src/resources/imagenes"
+
+# Crear la carpeta de imágenes si no existe
+os.makedirs(IMAGES_DIR, exist_ok=True)
 
 
 @producto_controller.get("/productos", response_model=list[ProductoDomain])
@@ -15,12 +22,6 @@ async def list_productos(
         producto_service: IProductoService = Depends(build_prodcuto_service)
 ):
     productos = await producto_service.get_all_productos()
-
-    # Agregar el prefijo MIME a cada imagen
-    for producto in productos:
-        if producto.imagen:
-            producto.imagen = f"data:image/jpeg;base64,{producto.imagen}"
-
     return productos
 
 
@@ -36,10 +37,10 @@ async def retrieve_producto_imagen(
             detail=f"Imagen for producto with ID {id} not found"
         )
 
-    # Decodifica la imagen de base64 y responde como bytes
-    imagen_bytes = base64.b64decode(producto.imagen)
+    # Devolver la imagen como archivo
+    imagen_path = os.path.join(IMAGES_DIR, producto.imagen)
+    return FileResponse(imagen_path)
 
-    return Response(content=imagen_bytes, media_type="image/jpeg")
 
 @producto_controller.get("/producto/{id}", response_model=ProductoDomain)
 async def retrieve_producto(
@@ -53,18 +54,20 @@ async def retrieve_producto(
             detail=f"Producto with ID {id} not found"
         )
 
-    # Agregar el prefijo MIME para la imagen
+    # Generar URL para la imagen si existe
     if producto.imagen:
-        producto.imagen = f"data:image/jpeg;base64,{producto.imagen}"
+        producto.imagen = f"/api/v1/producto/{producto.id}/imagen"
 
     return producto
 
 
-# Convertir la imagen a una cadena base64
-async def convertir_imagen_a_base64(imagen: UploadFile) -> str:
-    imagen_bytes = await imagen.read()  # Lee la imagen como bytes
-    imagen_base64 = base64.b64encode(imagen_bytes).decode('utf-8')  # Convierte los bytes a base64
-    return imagen_base64
+# Guardar la imagen en la carpeta de recursos y devolver el nombre del archivo
+async def save_image_to_disk(imagen: UploadFile) -> str:
+    filename = f"{uuid4()}.{imagen.filename.split('.')[-1]}"
+    file_path = os.path.join(IMAGES_DIR, filename)
+    with open(file_path, "wb") as f:
+        f.write(await imagen.read())
+    return filename
 
 
 @producto_controller.post("/producto", response_model=ProductoDomain, status_code=status.HTTP_201_CREATED)
@@ -78,16 +81,16 @@ async def create_producto(
         imagen: UploadFile = File(...),
         producto_service: IProductoService = Depends(build_prodcuto_service)
 ):
-    # Convertir la imagen a base64
-    imagen_base64 = await convertir_imagen_a_base64(imagen)
-
+    # Guardar la imagen en disco
+    imagen_filename = await save_image_to_disk(imagen)
+    print(imagen_filename)
     # Crear el DTO para el producto
     producto_dto = ProductoDTO(
         nombre=nombre,
         descripcion=descripcion,
         precio=precio,
         descuento=descuento,
-        imagen=imagen_base64,
+        imagen=imagen_filename,
         stock=stock,
         idCategoria=idcategoria
     )
@@ -105,7 +108,7 @@ async def update_producto(
         precio: float = Form(...),
         descuento: float = Form(...),
         stock: int = Form(...),
-        idCategoria:int =Form(...),
+        idCategoria: int = Form(...),
         imagen: UploadFile = File(...),
         producto_service: IProductoService = Depends(build_prodcuto_service)
 ):
@@ -116,8 +119,8 @@ async def update_producto(
             detail=f"Producto with ID {id} not found"
         )
 
-    # Convertir la imagen a base64
-    imagen_base64 = await convertir_imagen_a_base64(imagen)
+    # Guardar la nueva imagen en disco
+    imagen_filename = await save_image_to_disk(imagen)
 
     # Crear el DTO para el producto
     producto_dto = ProductoDTO(
@@ -125,7 +128,7 @@ async def update_producto(
         descripcion=descripcion,
         precio=precio,
         descuento=descuento,
-        imagen=imagen_base64,
+        imagen=imagen_filename,
         stock=stock,
         idCategoria=idCategoria
     )
@@ -146,5 +149,11 @@ async def delete_producto(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Producto with ID {id} not found"
         )
+    
+    # Eliminar la imagen del disco si existe
+    imagen_path = os.path.join(IMAGES_DIR, existing_producto.imagen)
+    if os.path.exists(imagen_path):
+        os.remove(imagen_path)
+    
     await producto_service.delete_producto(id)
     return {"message": f"Producto with ID {id} successfully deleted"}
