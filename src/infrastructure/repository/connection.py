@@ -19,7 +19,7 @@ def get_connection():
         if not connection.is_connected():
             connection.reconnect(attempts=3, delay=2)
         return connection
-    except Error as e:
+    except Error as e:  
         print(f"Error getting connection from pool: {e}")
         return None
 

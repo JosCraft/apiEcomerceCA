@@ -36,7 +36,8 @@ async def create_cliente(
 ):
     cliente = map_domain_dto_to_cliente(cliente_dto)
     return await cliente_service.create_cliente(cliente)
-@cliente_controller.post("/login(email)", response_model=ClienteDomain)
+
+@cliente_controller.post("/login", response_model=ClienteDomain)
 async def login_cliente(
     email: str = Form(...),  # Recibe el correo del cliente desde el formulario
     password: str = Form(...),  # Recibe la contraseña desde el formulario
@@ -59,6 +60,7 @@ async def login_cliente(
 
     # Si todo es correcto, devolver el cliente
     return cliente
+
 @cliente_controller.put("/cliente/{id}", response_model=ClienteDomain)
 async def update_cliente(
     id: int,

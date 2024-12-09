@@ -33,7 +33,7 @@ async def create_delivery(
 ):
     delivery = map_domain_dto_to_delivery(delivery_dto)
     return await delivery_service.create_delivery(delivery)
-@delivery_controller.post("/login", response_model=DeliveryDomain)
+@delivery_controller.post("/delivery/login", response_model=DeliveryDomain)
 async def login_delivery(
     email: str = Form(...),  # Recibe el correo del delivery desde el formulario
     password: str = Form(...),  # Recibe la contraseña desde el formulario
@@ -56,6 +56,8 @@ async def login_delivery(
 
     # Si todo es correcto, devolver el delivery
     return delivery
+
+
 @delivery_controller.put("/delivery/{id}", response_model=DeliveryDomain)
 async def update_delivery(
     id: int,
